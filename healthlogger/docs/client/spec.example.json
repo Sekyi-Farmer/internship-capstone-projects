@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "client": "Harbor Ops",
+  "requiredFields": ["service", "status", "timestamp"],
+  "allowedStatuses": ["ok", "degraded", "down"],
+  "severityMap": {
+    "ok": "info",
+    "degraded": "warn",
+    "down": "error"
+  },
+  "httpPort": 8088
+}

@@ -1,0 +1,8 @@
+{
+  "app": {
+    "name": "payments-api",
+    "port": 8080,
+    "region": "eu-west",
+    "features": ["metrics"]
+  }
+}

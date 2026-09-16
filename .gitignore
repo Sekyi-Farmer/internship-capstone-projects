@@ -1,0 +1,28 @@
+# Build output
+**/target/
+**/.pytest_cache/
+**/*.egg-info/
+.coverage
+htmlcov/
+**/coverage.xml
+
+# Runtime data (keep directory placeholders)
+**/data/*
+!**/data/.gitkeep
+*.key
+*.db
+*.sqlite
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/

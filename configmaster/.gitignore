@@ -1,0 +1,16 @@
+target/
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# Runtime overlays (keep the directory)
+data/*
+!data/.gitkeep
+
+# Local client spec copies that may contain secrets — keep the committed sample
+# config/client-spec.local.json
+*.key

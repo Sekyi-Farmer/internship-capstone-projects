@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0.0",
+  "client": "Sentinel SOC",
+  "severities": ["low", "medium", "high", "critical"],
+  "initialStatus": "new",
+  "statuses": ["new", "triaged", "assigned", "resolved", "closed"],
+  "transitions": {
+    "new": ["triaged", "closed"],
+    "triaged": ["assigned", "closed"],
+    "assigned": ["resolved", "closed"],
+    "resolved": ["closed"],
+    "closed": []
+  },
+  "roles": {
+    "analyst": ["create", "list", "get", "assign"],
+    "lead": ["create", "list", "get", "assign", "transition"],
+    "admin": ["create", "list", "get", "assign", "transition"]
+  },
+  "tokens": {
+    "analyst-token": "analyst",
+    "lead-token": "lead",
+    "admin-token": "admin"
+  }
+}
