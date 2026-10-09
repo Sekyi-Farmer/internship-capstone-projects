@@ -1,4 +1,4 @@
-# HealthLogger — Architecture
+﻿# HealthLogger - Architecture
 
 **Week 6**
 
@@ -402,9 +402,9 @@ HTTP 201 Created
 
 A valid event is stored and logged.
 
----
-
 ### 5.2 Invalid or Malformed `POST /events`
+
+The HTTP API handles malformed JSON and events that fail validation separately from valid events.
 
 ```text
 POST /events
@@ -413,5 +413,110 @@ POST /events
 Read request body
      |
      v
-Parse
+Parse JSON
+     |
+     +---- malformed JSON or JSON null
+     |                 |
+     |                 v
+     |          Record rejection
+     |                 |
+     |                 v
+     |          Return HTTP 400
+     |
+     v
+Validate event
+     |
+     +---- invalid event
+     |         |
+     |         v
+     |   Record rejection and reason
+     |         |
+     |         v
+     |   Return HTTP 400
+     |
+     v
+Store valid event
+     |
+     v
+Return success response
 ```
+
+If a request body exceeds the configured size limit, the server returns HTTP `413 Payload Too Large`.
+
+**Scope clarification:** Rejected-event storage applies to the HTTP request handling path. An invalid CLI `record` command reports an error and exits unsuccessfully; it does not currently save the rejected event to the rejection store.
+
+## 6. Client-Driven Configuration
+
+HealthLogger uses the client specification to define event fields and validation requirements. The implementation should read these requirements from the configured specification rather than hardcoding client-specific fields in Java classes.
+
+This allows the application to adapt when the client requirements change.
+
+## 7. Storage Architecture
+
+HealthLogger uses local JSON Lines (JSONL) files for persistence.
+
+* **Event store:** Stores accepted events, with one JSON object per line.
+* **Rejected-event store:** Stores rejected HTTP submissions and their rejection reasons.
+* **Configuration:** Defines the client requirements and application settings.
+
+The storage layer is responsible for writing and retrieving records. The application and HTTP layers handle request processing and validation before accepted events are stored.
+
+## 8. Logging Architecture
+
+Application logs provide information about server startup, request processing, and errors. Benchmark output and server logs are separate from the event data files.
+
+Logs should help with troubleshooting without unnecessarily exposing sensitive information.
+
+## 9. Error Handling
+
+HealthLogger distinguishes between malformed input, validation failures, oversized requests, and internal application errors.
+
+* Malformed JSON and validation failures in HTTP requests return HTTP `400`.
+* Requests exceeding the body-size limit return HTTP `413`.
+* Valid requests are processed and stored before a success response is returned.
+* CLI commands report failures through their exit status and error output.
+
+Error responses should communicate the problem without exposing unnecessary implementation details.
+
+## 10. Testing Architecture
+
+Tests verify the behavior of the application at different levels.
+
+* **Unit tests:** Verify parsing, validation, and individual application components.
+* **CLI tests:** Verify command behavior, exit codes, and output.
+* **HTTP tests:** Verify endpoints, response codes, valid events, and rejected requests.
+* **Storage tests:** Verify that accepted events and rejected submissions are persisted as expected.
+
+Tests should avoid relying on fixed ports or timing assumptions when a dynamically assigned port or deterministic assertion can be used.
+
+## 11. Security Considerations
+
+HealthLogger should validate incoming data, enforce the configured request-body size limit, and avoid exposing sensitive information in logs or error responses.
+
+Repository changes should follow the project's security guidance. Credentials and other secrets should not be committed to source control.
+
+Authentication and authorization requirements should follow the client specification rather than being assumed to exist.
+
+## 12. Deployment Considerations
+
+HealthLogger is a Java 21 application built with Maven. It uses the JDK HTTP server and the project's configured dependencies.
+
+Deployment requires the appropriate Java runtime, application configuration, and write access to the configured storage locations.
+
+The application should be built and tested before deployment. Environment-specific paths should not be hardcoded into reusable scripts.
+
+## 13. Architectural Principles
+
+The design follows these principles:
+
+* **Separation of concerns:** Request handling, validation, storage, and logging have distinct responsibilities.
+* **Configuration-driven behavior:** Client-specific requirements are defined in configuration.
+* **Explicit error handling:** Invalid input is handled deliberately.
+* **Testability:** Components should be testable without depending unnecessarily on fixed ports or machine-specific settings.
+* **Maintainability:** Documentation should reflect the current implementation and be updated when behavior changes.
+
+## 14. Summary
+
+HealthLogger provides a CLI and a small HTTP API for recording and querying health events. It validates incoming events, stores accepted events in JSONL format, and records rejected HTTP submissions with their rejection reasons.
+
+The architecture is intended to remain simple, configuration-driven, testable, and maintainable while meeting the requirements in the client specification.
