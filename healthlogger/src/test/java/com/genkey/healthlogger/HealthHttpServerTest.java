@@ -321,6 +321,8 @@ class HealthHttpServerTest {
         }
     }
 
+
+
     @Test
     void postEventsAcceptsExtraFields() throws Exception {
         Path tempDir = Files.createTempDirectory("healthlogger-http-test");
@@ -379,6 +381,45 @@ class HealthHttpServerTest {
             server.stop();
         }
     }
+    
+@Test
+void postEventsRejectsJsonNullAndSavesRejection() throws Exception {
+    Path tempDir = Files.createTempDirectory("healthlogger-http-test");
+    Path eventsPath = tempDir.resolve("events.jsonl");
+    Path rejectedPath = tempDir.resolve("rejected-events.jsonl");
+
+    int port = findFreePort();
+    ClientSpec spec = testSpec(port);
+    JsonlStore store = new JsonlStore(eventsPath);
+    RejectedEventStore rejectedStore =
+            new RejectedEventStore(rejectedPath);
+
+    HealthHttpServer server =
+            new HealthHttpServer(spec, store, rejectedStore);
+
+    server.start();
+
+    try {
+        HttpResponse<String> response = send(
+                "POST",
+                port,
+                "/events",
+                "null"
+        );
+
+        assertEquals(400, response.statusCode());
+        assertTrue(store.query(null).isEmpty());
+        assertTrue(Files.exists(rejectedPath));
+
+        String rejection = Files.readString(rejectedPath);
+        assertTrue(rejection.contains("malformed JSON"));
+    } finally {
+        server.stop();
+    }
+}
+
+
+
 
     private static ClientSpec testSpec(int port) {
         return new ClientSpec(
