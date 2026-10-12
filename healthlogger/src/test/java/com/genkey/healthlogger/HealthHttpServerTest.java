@@ -36,6 +36,8 @@ class HealthHttpServerTest {
         server.start();
         port = server.port();
 
+        port = server.port();
+
         try {
             HttpResponse<String> response = send(
                     "GET",
@@ -406,7 +408,7 @@ void postEventsRejectsJsonNullAndSavesRejection() throws Exception {
     Path eventsPath = tempDir.resolve("events.jsonl");
     Path rejectedPath = tempDir.resolve("rejected-events.jsonl");
 
-    int port = findFreePort();
+    int port = 0;
     ClientSpec spec = testSpec(port);
     JsonlStore store = new JsonlStore(eventsPath);
     RejectedEventStore rejectedStore =
@@ -416,6 +418,8 @@ void postEventsRejectsJsonNullAndSavesRejection() throws Exception {
             new HealthHttpServer(spec, store, rejectedStore);
 
     server.start();
+
+        port = server.port();
 
     try {
         HttpResponse<String> response = send(
