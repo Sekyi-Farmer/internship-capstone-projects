@@ -3,8 +3,6 @@ package com.genkey.healthlogger;
 import com.genkey.healthlogger.model.HealthEvent;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -24,7 +22,7 @@ class HealthHttpServerTest {
         Path eventsPath = tempDir.resolve("events.jsonl");
         Path rejectedPath = tempDir.resolve("rejected-events.jsonl");
 
-        int port = findFreePort();
+        int port = 0;
 
         ClientSpec spec = testSpec(port);
         JsonlStore store = new JsonlStore(eventsPath);
@@ -35,6 +33,8 @@ class HealthHttpServerTest {
                 new HealthHttpServer(spec, store, rejectedStore);
 
         server.start();
+
+        port = server.port();
 
         try {
             HttpResponse<String> response = send(
@@ -60,7 +60,7 @@ class HealthHttpServerTest {
         Path eventsPath = tempDir.resolve("events.jsonl");
         Path rejectedPath = tempDir.resolve("rejected-events.jsonl");
 
-        int port = findFreePort();
+        int port = 0;
 
         ClientSpec spec = testSpec(port);
         JsonlStore store = new JsonlStore(eventsPath);
@@ -71,6 +71,8 @@ class HealthHttpServerTest {
                 new HealthHttpServer(spec, store, rejectedStore);
 
         server.start();
+
+        port = server.port();
 
         try {
             String body = """
@@ -118,7 +120,7 @@ class HealthHttpServerTest {
         Path eventsPath = tempDir.resolve("events.jsonl");
         Path rejectedPath = tempDir.resolve("rejected-events.jsonl");
 
-        int port = findFreePort();
+        int port = 0;
 
         ClientSpec spec = testSpec(port);
         JsonlStore store = new JsonlStore(eventsPath);
@@ -129,6 +131,8 @@ class HealthHttpServerTest {
                 new HealthHttpServer(spec, store, rejectedStore);
 
         server.start();
+
+        port = server.port();
 
         try {
             String body = """
@@ -184,7 +188,7 @@ class HealthHttpServerTest {
         Path eventsPath = tempDir.resolve("events.jsonl");
         Path rejectedPath = tempDir.resolve("rejected-events.jsonl");
 
-        int port = findFreePort();
+        int port = 0;
 
         ClientSpec spec = testSpec(port);
         JsonlStore store = new JsonlStore(eventsPath);
@@ -195,6 +199,8 @@ class HealthHttpServerTest {
                 new HealthHttpServer(spec, store, rejectedStore);
 
         server.start();
+
+        port = server.port();
 
         try {
             String body =
@@ -240,7 +246,7 @@ class HealthHttpServerTest {
         Path eventsPath = tempDir.resolve("events.jsonl");
         Path rejectedPath = tempDir.resolve("rejected-events.jsonl");
 
-        int port = findFreePort();
+        int port = 0;
 
         ClientSpec spec = testSpec(port);
         JsonlStore store = new JsonlStore(eventsPath);
@@ -251,6 +257,8 @@ class HealthHttpServerTest {
                 new HealthHttpServer(spec, store, rejectedStore);
 
         server.start();
+
+        port = server.port();
 
         try {
             HttpResponse<String> response = send(
@@ -287,7 +295,7 @@ class HealthHttpServerTest {
         Path eventsPath = tempDir.resolve("events.jsonl");
         Path rejectedPath = tempDir.resolve("rejected-events.jsonl");
 
-        int port = findFreePort();
+        int port = 0;
 
         ClientSpec spec = testSpec(port);
         JsonlStore store = new JsonlStore(eventsPath);
@@ -298,6 +306,8 @@ class HealthHttpServerTest {
                 new HealthHttpServer(spec, store, rejectedStore);
 
         server.start();
+
+        port = server.port();
 
         try {
             String hugeBody = "x".repeat(
@@ -329,7 +339,7 @@ class HealthHttpServerTest {
         Path eventsPath = tempDir.resolve("events.jsonl");
         Path rejectedPath = tempDir.resolve("rejected-events.jsonl");
 
-        int port = findFreePort();
+        int port = 0;
 
         ClientSpec spec = testSpec(port);
         JsonlStore store = new JsonlStore(eventsPath);
@@ -340,6 +350,8 @@ class HealthHttpServerTest {
                 new HealthHttpServer(spec, store, rejectedStore);
 
         server.start();
+
+        port = server.port();
 
         try {
             String body = """
@@ -388,7 +400,7 @@ void postEventsRejectsJsonNullAndSavesRejection() throws Exception {
     Path eventsPath = tempDir.resolve("events.jsonl");
     Path rejectedPath = tempDir.resolve("rejected-events.jsonl");
 
-    int port = findFreePort();
+    int port = 0;
     ClientSpec spec = testSpec(port);
     JsonlStore store = new JsonlStore(eventsPath);
     RejectedEventStore rejectedStore =
@@ -398,6 +410,8 @@ void postEventsRejectsJsonNullAndSavesRejection() throws Exception {
             new HealthHttpServer(spec, store, rejectedStore);
 
     server.start();
+
+        port = server.port();
 
     try {
         HttpResponse<String> response = send(
@@ -444,11 +458,6 @@ void postEventsRejectsJsonNullAndSavesRejection() throws Exception {
         );
     }
 
-    private static int findFreePort() throws IOException {
-        try (ServerSocket socket = new ServerSocket(0)) {
-            return socket.getLocalPort();
-        }
-    }
 
     private static HttpResponse<String> send(
             String method,

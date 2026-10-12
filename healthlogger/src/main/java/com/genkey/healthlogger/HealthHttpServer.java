@@ -16,8 +16,8 @@ import java.util.Map;
 /**
  * Tiny local HTTP surface (JDK HttpServer, not a servlet container).
  *
- * POST /events — record a valid event or save a rejected submission.
- * GET /health  — liveness check.
+ * POST /events â€” record a valid event or save a rejected submission.
+ * GET /health  â€” liveness check.
  */
 public final class HealthHttpServer {
 
@@ -54,8 +54,12 @@ public final class HealthHttpServer {
         server.start();
 
         System.err.println(
-                "listening on http://127.0.0.1:" + spec.port()
+                "listening on http://127.0.0.1:" + server.getAddress().getPort()
         );
+    }
+
+    public int port() {
+        return server.getAddress().getPort();
     }
 
     public void stop() {
