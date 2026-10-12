@@ -12,8 +12,7 @@ rm -f "$STORE" "$SERVER_LOG"
 
 echo "Starting HealthLogger server..."
 
-"D:/apache-maven-3.10.0-rc-1-bin/apache-maven-3.9.16/bin/mvn.cmd" \
-    -q exec:java \
+mvn -q exec:java \
     "-Dexec.mainClass=com.genkey.healthlogger.HealthLoggerCli" \
     "-Dexec.args=serve --store $STORE" \
     > "$SERVER_LOG" 2>&1 &
@@ -28,20 +27,29 @@ trap cleanup EXIT
 
 echo "Waiting for server..."
 
+SERVER_READY=false
+
 for i in {1..20}; do
-    if curl -s "http://127.0.0.1:$PORT/health" > /dev/null; then
+    if curl --fail --silent "http://127.0.0.1:$PORT/health" > /dev/null; then
+        SERVER_READY=true
         break
     fi
 
     sleep 0.5
 done
 
+if [ "$SERVER_READY" != true ]; then
+    echo "ERROR: HealthLogger server did not start."
+    cat "$SERVER_LOG"
+    exit 1
+fi
+
 echo "Running benchmark with $N events..."
 
 START=$(date +%s%N)
 
 for ((i=1; i<=N; i++)); do
-    curl -s -o /dev/null \
+    curl --fail --silent --show-error -o /dev/null \
         -X POST \
         -H "Content-Type: application/json" \
         -d "{\"service\":\"benchmark-api\",\"status\":\"ok\",\"timestamp\":\"2026-10-06T00:00:00Z\",\"id\":$i}" \
