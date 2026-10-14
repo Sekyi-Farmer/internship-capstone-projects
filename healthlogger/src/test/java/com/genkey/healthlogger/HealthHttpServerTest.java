@@ -311,7 +311,25 @@ class HealthHttpServerTest {
                     hugeBody
             );
 
+
             assertEquals(413, response.statusCode());
+
+            assertTrue(
+                    Files.exists(rejectedPath),
+                    "Oversized request should be recorded"
+            );
+
+            String rejection = Files.readString(rejectedPath);
+
+            assertTrue(
+                    rejection.contains("request body exceeds maximum size"),
+                    "Rejection reason should explain why the request was rejected"
+            );
+
+            assertTrue(
+                    rejection.contains("request body omitted: exceeds maximum size"),
+                    "The record should contain a bounded description, not the request body"
+            );
 
             assertTrue(
                     store.query(null).isEmpty()
