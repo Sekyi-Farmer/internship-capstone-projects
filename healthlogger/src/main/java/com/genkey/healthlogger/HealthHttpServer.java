@@ -98,7 +98,20 @@ public final class HealthHttpServer {
                     ex.getRequestBody(),
                     MAX_REQUEST_BODY_BYTES
             );
+
         } catch (RequestTooLargeException e) {
+            try {
+                rejectedStore.append(
+                        "[request body omitted: exceeds maximum size]",
+                        "request body exceeds maximum size"
+                );
+            } catch (IOException loggingError) {
+                System.err.println(
+                        "Failed to record oversized request: "
+                                + loggingError.getMessage()
+                );
+            }
+
             send(
                     ex,
                     413,
@@ -107,12 +120,14 @@ public final class HealthHttpServer {
             return;
         }
 
+
         String body = new String(
                 bodyBytes,
                 StandardCharsets.UTF_8
         );
 
         HealthEvent event;
+
 
         try {
             event = Json.parseEvent(body);
@@ -125,15 +140,13 @@ public final class HealthHttpServer {
             send(
                     ex,
                     400,
-                    Json.toJson(
-                            Map.of(
-                                    "error",
-                                    "malformed JSON"
-                            )
-                    )
+                    "{\"error\":\"malformed JSON\"}"
             );
             return;
         }
+
+
+
 
         List<String> issues = Json.validate(event, spec);
 
