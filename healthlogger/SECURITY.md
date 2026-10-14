@@ -44,7 +44,7 @@ The rejected-event store may contain request metadata and validation reasons for
 - Review files before committing changes.
 - Preserve the repository's intended `.gitignore` rules for runtime data.
 
-If a credential or sensitive value is committed accidentally, revoke or rotate the affected credential promptly. Removing it from the latest file or commit does not remove it from Git history. Coordinate any history cleanup with repository maintainers, especially if the branch has already been shared.
+If a credential or sensitive value is committed accidentally, revoke or rotate the affected credential immediately. Removing it from the latest file or commit does not remove it from Git history. When sensitive data has been exposed, coordinate with repository maintainers to purge it from Git history where appropriate. This may require rewriting commit history and performing a coordinated force-push. Notify affected collaborators before rewriting shared history, and verify that the exposed credential is no longer usable.
 
 ## HTTP Bind Address
 
