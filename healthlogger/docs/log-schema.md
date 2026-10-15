@@ -26,7 +26,13 @@ data/events.jsonl
 ```
 
 Each valid event occupies one line in the file.
+## Configuring the event-store path
 
+By default, HealthLogger stores valid events in data/events.jsonl.
+
+The event-store path can be changed using the --store command-line option or the HEALTHLOGGER_STORE environment variable. When a custom event-store path is used, rejected HTTP submissions are stored in a sibling file named rejected-events.jsonl in the same directory.
+
+For example, if the event-store path is custom/events.jsonl, the rejection-store path is custom/rejected-events.jsonl.
 Example:
 
 ```json
