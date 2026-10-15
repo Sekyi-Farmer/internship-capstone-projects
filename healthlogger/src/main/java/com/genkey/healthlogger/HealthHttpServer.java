@@ -117,6 +117,13 @@ public final class HealthHttpServer {
                         "Failed to record oversized request: "
                                 + loggingError.getMessage()
                 );
+                  // ADD THE 500 RESPONSE HERE
+                send(
+                        ex,
+                        500,
+                        "{\"error\":\"failed to record rejected request\"}"
+                );
+                return;
             }
 
             send(

@@ -53,7 +53,7 @@ public final class HealthLoggerCli {
 
         ClientSpec spec = Json.loadSpec(specPath);
         JsonlStore store = new JsonlStore(storePath);
-        Path rejectedStorePath = Path.of("data/rejected-events.jsonl");
+        Path rejectedStorePath = storePath.resolveSibling("rejected-events.jsonl");
         RejectedEventStore rejectedStore = new RejectedEventStore(rejectedStorePath);
         return switch (command) {
             case "record" -> {
