@@ -8,16 +8,14 @@ HealthLogger uses JSON Lines (JSONL) for storing health events and for producing
 
 Each JSONL record is a complete JSON object stored on a single line.
 
-The two JSONL outputs serve different purposes:
+The JSONL outputs serve different purposes:
 
-* `data/events.jsonl` stores valid health events.
+* By default, `data/events.jsonl` stores valid health events. The event-store path can be overridden using the `--store` command-line option or the `HEALTHLOGGER_STORE` environment variable.
 * Standard output contains structured operational logs for processed events.
 
-Rejected HTTP submissions are stored separately in:
+Rejected HTTP submissions are stored separately in `data/rejected-events.jsonl`.
 
-* `data/rejected-events.jsonl`
-
----
+Unless otherwise stated, references to `data/events.jsonl` and `data/rejected-events.jsonl` in this document describe the default storage paths.
 
 ## 2. Valid Event Storage
 
@@ -78,9 +76,9 @@ data/rejected-events.jsonl
 
 A rejected record contains:
 
-* `timestamp` — when the rejection was recorded
-* `input` — the submitted input
-* `reason` — why the submission was rejected
+* `timestamp` - when the rejection was recorded
+* `input` - the submitted input
+* `reason` - why the submission was rejected
 
 Example:
 
@@ -88,17 +86,18 @@ Example:
 {"timestamp":"2026-10-01T14:05:31Z","input":{"status":"ok","service":"payments-api"},"reason":"missing required field: timestamp"}
 ```
 
-Malformed JSON is also recorded.
+Malformed JSON is also recorded. The rejection reason begins with `malformed JSON` and may include additional details from the JSON parser.
 
-Example:
+Example (the parser detail is illustrative):
 
 ```json
 {
   "timestamp":"2026-10-01T14:13:55Z",
   "input":"{\"service\":\"payments-api\",\"status\":",
-  "reason":"malformed JSON"
+  "reason":"malformed JSON: [parser error details]"
 }
 ```
+
 
 Rejected records are not written to `data/events.jsonl`.
 
@@ -181,7 +180,7 @@ Example:
 ```
 
 The event fields come from the submitted JSON and are not represented by a fixed Java event schema.
-
+cd..\
 ---
 
 ## 5. Difference Between Event Storage and Structured Logs
