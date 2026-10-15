@@ -54,7 +54,7 @@ public final class HealthHttpServer {
         server.start();
 
         System.err.println(
-                "listening on http://127.0.0.1:" + spec.port()
+                "listening on http://127.0.0.1:" + server.getAddress().getPort()
         );
     }
 
@@ -63,6 +63,13 @@ public final class HealthHttpServer {
             server.stop(0);
         }
     }
+    public int port() {
+    if (server == null) {
+        throw new IllegalStateException("Server has not started");
+    }
+
+    return server.getAddress().getPort();
+}
 
     private void health(HttpExchange ex) throws IOException {
         if (!"GET".equals(ex.getRequestMethod())) {
