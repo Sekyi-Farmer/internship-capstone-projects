@@ -8,12 +8,19 @@ PORT=8088
 STORE="data/benchmark-events.jsonl"
 SERVER_LOG="data/benchmark-server.log"
 
+# Find Maven from PATH, or allow a custom command through MAVEN.
+MAVEN="${MAVEN:-mvn}"
+
+if ! command -v "$MAVEN" >/dev/null 2>&1; then
+    echo "Maven not found. Install Maven or set MAVEN=/path/to/mvn." >&2
+    exit 2
+fi
+
 rm -f "$STORE" "$SERVER_LOG"
 
 echo "Starting HealthLogger server..."
 
-"D:/apache-maven-3.10.0-rc-1-bin/apache-maven-3.9.16/bin/mvn.cmd" \
-    -q exec:java \
+"$MAVEN" -q exec:java \
     "-Dexec.mainClass=com.genkey.healthlogger.HealthLoggerCli" \
     "-Dexec.args=serve --store $STORE" \
     > "$SERVER_LOG" 2>&1 &
@@ -28,13 +35,21 @@ trap cleanup EXIT
 
 echo "Waiting for server..."
 
+SERVER_READY=false
+
 for i in {1..20}; do
     if curl -s "http://127.0.0.1:$PORT/health" > /dev/null; then
+        SERVER_READY=true
         break
     fi
 
     sleep 0.5
 done
+
+if [ "$SERVER_READY" != true ]; then
+    echo "Server failed to start. Check $SERVER_LOG for details." >&2
+    exit 1
+fi
 
 echo "Running benchmark with $N events..."
 
