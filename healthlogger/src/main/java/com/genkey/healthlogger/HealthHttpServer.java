@@ -116,8 +116,7 @@ public final class HealthHttpServer {
                 System.err.println(
                         "Failed to record oversized request: "
                                 + loggingError.getMessage()
-                );
-                  // ADD THE 500 RESPONSE HERE
+                 );
                 send(
                         ex,
                         500,
