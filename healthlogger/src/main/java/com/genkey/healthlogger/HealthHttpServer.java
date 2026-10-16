@@ -117,10 +117,17 @@ public final class HealthHttpServer {
         try {
             event = Json.parseEvent(body);
         } catch (Exception e) {
-            rejectedStore.append(
-                    body,
-                    "malformed JSON: " + e.getMessage()
-            );
+            try {
+                rejectedStore.append(
+                        body,
+                        "malformed JSON: " + e.getMessage()
+                );
+            } catch (IOException storageError) {
+                System.err.println(
+                        "Failed to store rejected malformed JSON: "
+                                + storageError.getMessage()
+                );
+            }
 
             send(
                     ex,
@@ -135,13 +142,21 @@ public final class HealthHttpServer {
             return;
         }
 
+
         List<String> issues = Json.validate(event, spec);
 
-        if (!issues.isEmpty()) {
-            rejectedStore.append(
-                    event.fields(),
-                    String.join("; ", issues)
-            );
+         if (!issues.isEmpty()) {
+            try {
+                rejectedStore.append(
+                        event.fields(),
+                        String.join("; ", issues)
+                );
+            } catch (IOException storageError) {
+                System.err.println(
+                        "Failed to store rejected event: "
+                                + storageError.getMessage()
+                );
+            }
 
             send(
                     ex,
@@ -155,6 +170,7 @@ public final class HealthHttpServer {
             );
             return;
         }
+
 
         store.append(event);
 
