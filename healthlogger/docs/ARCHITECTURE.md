@@ -68,6 +68,7 @@ The system follows a simple processing pipeline:
               v
             stdout
 ```
+**Note:** `RejectedEventStore` is used only for rejected HTTP submissions. Invalid CLI `record` commands report an error and exit unsuccessfully; they do not write to `data/rejected-events.jsonl`.
 
 The active client requirements are loaded from:
 
