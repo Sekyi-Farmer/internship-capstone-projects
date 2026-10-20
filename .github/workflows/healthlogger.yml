@@ -36,10 +36,9 @@ jobs:
         with:
           config: "p/java"
 
-  container-scan:
+   container-scan:
     runs-on: ubuntu-latest
     needs: [test]
-    if: hashFiles('healthlogger/Dockerfile') != ''
     steps:
       - uses: actions/checkout@v4
       - run: docker build -t healthlogger:ci .

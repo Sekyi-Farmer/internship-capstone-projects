@@ -44,7 +44,7 @@ public final class HealthHttpServer {
 
     public void start() throws IOException {
         server = HttpServer.create(
-                new InetSocketAddress("127.0.0.1", spec.port()),
+                new InetSocketAddress("0.0.0.0", spec.port()),
                 0
         );
 
