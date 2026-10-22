@@ -148,23 +148,37 @@ scripts/benchmark.ps1
 ```
 
 Unlike the original Bash benchmark, this script uses PowerShell's `Invoke-WebRequest` to send HTTP requests and verify that each request returns HTTP `201 Created`.
-
 The script also checks that the number of stored JSONL records matches the number of requested events.
 
 ### 9.1 Results
 
-| Events | Elapsed Time | Events/Second |
-| -----: | -----------: | ------------: |
-| 10 | 1.855 seconds | 5.39 |
-| 10 | 1.511 seconds | 6.62 |
-| 100 | 9.000 seconds | 11.11 |
-| 500 | 24.378 seconds | 20.51 |
-| 1,000 | 38.639 seconds | 25.88 |
+The following historical measurements were obtained using the PowerShell benchmark script.
 
-All five runs completed successfully. Each run reported that every requested event received HTTP `201` and was stored.
+| Events | Elapsed Time   | Events/Second |
+| -----: | -----------:   | ------------: |
+| 10     | 1.855 seconds  | 5.39          |
+| 10     | 1.511 seconds  | 6.62          |
+| 100    | 9.000 seconds  | 11.11         |
+| 500    | 24.378 seconds | 20.51         |
+| 1,000  | 38.639 seconds | 25.88         |
 
-The two 10-event runs produced different measurements, illustrating that short benchmarks can be affected by startup conditions and measurement variability.
+All five historical runs completed successfully. Each run reported that every requested event received HTTP `201` and was stored. The two 10-event runs produced different measurements, illustrating that short benchmarks can be affected by startup conditions and measurement variability.
 
+### 9.1.1 Latest PowerShell Benchmark Results
+
+These measurements were collected on 22 October 2026 using the Windows development computer.
+
+| Events | Elapsed Time   | Events/Second | Result |
+| -----: | -----------:   | ------------: | :----- |
+| 10     | 0.674 seconds  | 14.85         | PASS   |
+| 100    | 3.137 seconds  | 31.88         | PASS   |
+| 1,000  | 29.824 seconds | 33.53         | PASS   |
+
+All three runs completed successfully. Every requested event received HTTP `201 Created`, and the expected number of events was stored in the benchmark JSONL file.
+
+Throughput increased across these three measurements. However, each workload was measured only once in this session, so the results are preliminary. Repeated runs under consistent conditions are needed to assess variability and establish a more reliable performance baseline.
+
+These results were collected using the Windows PowerShell benchmark script and should be interpreted separately from the Bash benchmark measurements.
 ### 9.2 Reproducing the PowerShell Benchmark
 
 Run these commands from the HealthLogger project root in PowerShell:
