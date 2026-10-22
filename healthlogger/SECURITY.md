@@ -10,11 +10,19 @@ The policy applies to the current HealthLogger implementation and should be revi
 
 ## Reporting a Vulnerability
 
-Report suspected security vulnerabilities privately to the project maintainer rather than disclosing them publicly.
+The recommended reporting channel for HealthLogger is [GitHub Private Vulnerability Reporting](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/report-privately). A repository owner or administrator must enable this feature before it can be used. It allows a person to send a report privately to the repository maintainers instead of posting the details publicly.
 
-Use the repository's private vulnerability reporting feature if it is enabled. Otherwise, ask the project supervisor or repository maintainer for the approved private reporting contact. Do not assume a reporting email address unless it has been officially provided.
+To submit a report when the feature is enabled:
 
-A vulnerability report should include:
+1. Open the HealthLogger repository on GitHub.
+2. Open the **Security and quality** section. If it is not visible in the repository tabs, look for it in the dropdown menu.
+3. Select **Report a vulnerability** and complete the private reporting form.
+
+Do not report security vulnerabilities through public GitHub issues, pull requests, or public messages.
+
+If **Report a vulnerability** is not available, do not post the vulnerability details publicly. Contact the project supervisor or repository maintainer through an approved private GenKey channel and ask for the designated way to submit the report. The repository owner or administrator should enable GitHub Private Vulnerability Reporting or confirm an approved alternative private channel.
+
+A report should include:
 
 - A clear description of the security issue and its potential impact.
 - The affected component, file, or feature, if known.
@@ -23,9 +31,9 @@ A vulnerability report should include:
 
 Do not include passwords, access tokens, API keys, real credentials, or other sensitive operational data in a report. Remove sensitive information from logs and screenshots before sharing them.
 
-Vulnerabilities should not be publicly disclosed through GitHub issues, pull requests, or other public project channels before the maintainers have had a reasonable opportunity to investigate.
+After a report is received, the project maintainer or designated security contact should acknowledge receipt through the private reporting channel, assess the issue, involve the appropriate developer or team, coordinate the fix, and keep the reporter updated. GenKey should set the expected acknowledgement time; this policy does not promise a response deadline that has not been approved.
 
-The reporting channel and acknowledgement process must be confirmed with the project supervisor or repository maintainer.
+Keep the report and technical details private while the issue is being investigated and fixed. Public disclosure should be coordinated by the maintainer and designated security contact, normally after a fix or suitable mitigation is available and has been checked.
 
 ## Event Store
 
