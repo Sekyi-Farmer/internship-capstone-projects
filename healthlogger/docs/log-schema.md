@@ -81,7 +81,7 @@ data/rejected-events.jsonl
 A rejected record contains:
 
 * `timestamp` - when the rejection was recorded
-* `input` - the submitted input
+* `input` - the rejected submission's input. For HTTP requests exceeding 1 MiB, this is the bounded placeholder `[request body omitted: exceeds maximum size]` instead of the full request body.
 * `reason` - why the submission was rejected
 
 Example:
