@@ -25,6 +25,8 @@ By default, valid events are stored in `data/events.jsonl`. Each valid event occ
 
 The event-store path can be changed using the `--store` command-line option or the `HEALTHLOGGER_STORE` environment variable.
 
+If both `--store` and `HEALTHLOGGER_STORE` are provided, the `--store` command-line option takes precedence.
+
 Rejected HTTP submissions are stored separately in a file named `rejected-events.jsonl` in the same directory as the configured event store. By default, this file is `data/rejected-events.jsonl`.
 
 For example, if the event-store path is `custom/events.jsonl`, rejected HTTP submissions are stored in `custom/rejected-events.jsonl`.
@@ -182,7 +184,7 @@ Example:
 ```
 
 The event fields come from the submitted JSON and are not represented by a fixed Java event schema.
-cd..\
+
 ---
 
 ## 5. Difference Between Event Storage and Structured Logs
@@ -233,7 +235,7 @@ The two formats should not be treated as interchangeable.
 
 ---
 
-## 6. HTTP Processing Flow
+ ## 6. HTTP Processing Flow
 
 For an HTTP event submission, the data flow is:
 
@@ -241,34 +243,46 @@ For an HTTP event submission, the data flow is:
 POST /events
       |
       v
-Read request body
+Read request body (maximum 1 MiB)
       |
       v
-Parse JSON
+Body exceeds 1 MiB?
       |
-      +----------------------+
-      |                      |
-      v                      v
-Malformed JSON          Valid JSON
-      |                      |
-      v                      v
-RejectedEventStore        Validate
-                               |
-                     +---------+---------+
-                     |                   |
-                     v                   v
-                  Invalid              Valid
-                     |                   |
-                     v                   v
-             RejectedEventStore      JsonlStore
-                                         |
-                                         v
-                                StructuredLogger
-                                         |
-                                         v
-                                      stdout
+      +--------------------------+
+      |                          |
+     Yes                         No
+      |                          |
+      v                          v
+Store bounded placeholder    Parse JSON
+in RejectedEventStore            |
+      |                          +----------------------+
+      v                          |                      |
+Rejection saved?                 v                      v
+      |                     Malformed JSON         Valid JSON
+  +---+---+                      |                      |
+  |       |                      v                      v
+ Yes      No              Record rejection          Validate
+  |       |                      |                      |
+  v       v                      v              +-------+-------+
+HTTP    HTTP                 Rejection saved?    |               |
+413     500                       |              v               v
+                              +---+---+        Invalid          Valid
+                              |       |           |               |
+                             Yes      No          v               v
+                              |       |     RejectedEventStore  JsonlStore
+                              v       v                           |
+                           HTTP 400 HTTP 500                       v
+                                                            StructuredLogger
+                                                                   |
+                                                                   v
+                                                                 stdout
 ```
 
+For oversized requests, the stored `input` is the bounded placeholder `[request body omitted: exceeds maximum size]`, rather than the full request body. If recording the oversized request fails, the server returns HTTP `500` instead of `413`.
+
+Malformed JSON returns HTTP `400` when its rejection record is saved successfully, or HTTP `500` if that write fails.
+
+Valid events are stored in `events.jsonl` and also produce a structured stdout log. Invalid or malformed submissions are recorded separately in `rejected-events.jsonl`.
 Valid events are therefore stored in `events.jsonl` and also produce a structured stdout log.
 
 Invalid or malformed submissions are recorded separately in `rejected-events.jsonl`.
