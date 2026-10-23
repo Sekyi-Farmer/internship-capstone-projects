@@ -235,7 +235,7 @@ The two formats should not be treated as interchangeable.
 
 ---
 
- ## 6. HTTP Processing Flow
+## 6. HTTP Processing Flow
 
 For an HTTP event submission, the data flow is:
 
@@ -255,35 +255,34 @@ Body exceeds 1 MiB?
       v                          v
 Store bounded placeholder    Parse JSON
 in RejectedEventStore            |
-      |                          +----------------------+
-      v                          |                      |
-Rejection saved?                 v                      v
-      |                     Malformed JSON         Valid JSON
-  +---+---+                      |                      |
-  |       |                      v                      v
- Yes      No              Record rejection          Validate
-  |       |                      |                      |
-  v       v                      v              +-------+-------+
-HTTP    HTTP                 Rejection saved?    |               |
-413     500                       |              v               v
-                              +---+---+        Invalid          Valid
-                              |       |           |               |
-                             Yes      No          v               v
-                              |       |     RejectedEventStore  JsonlStore
-                              v       v                           |
-                           HTTP 400 HTTP 500                       v
-                                                            StructuredLogger
-                                                                   |
-                                                                   v
-                                                                 stdout
+      |                          v
+      v                     Malformed JSON?
+Rejection saved?                 |
+      |                     +----+----+
+  +---+---+                 |         |
+  |       |                Yes        No
+ Yes      No                 |         |
+  |       |                  v         v
+  v       v             Record       Validate
+HTTP    HTTP             rejection      |
+413     500                 |      +----+----+
+                            v      |         |
+                         Rejection Invalid   Valid
+                         saved?      |         |
+                            |        v         v
+                        +---+---+ Rejected  JsonlStore
+                        |       | EventStore    |
+                       Yes      No              v
+                        |       |        StructuredLogger
+                        v       v               |
+                     HTTP 400 HTTP 500          v
+                                             stdout
 ```
-
 For oversized requests, the stored `input` is the bounded placeholder `[request body omitted: exceeds maximum size]`, rather than the full request body. If recording the oversized request fails, the server returns HTTP `500` instead of `413`.
 
-Malformed JSON returns HTTP `400` when its rejection record is saved successfully, or HTTP `500` if that write fails.
+Malformed JSON returns HTTP `400` if its rejection record is saved successfully, or HTTP `500` if that write fails.
 
 Valid events are stored in `events.jsonl` and also produce a structured stdout log. Invalid or malformed submissions are recorded separately in `rejected-events.jsonl`.
-Valid events are therefore stored in `events.jsonl` and also produce a structured stdout log.
 
 Invalid or malformed submissions are recorded separately in `rejected-events.jsonl`.
 
