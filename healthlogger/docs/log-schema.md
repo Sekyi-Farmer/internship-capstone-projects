@@ -275,16 +275,14 @@ HTTP    HTTP             rejection      |
                        Yes      No              v
                         |       |        StructuredLogger
                         v       v               |
-                     HTTP 400 HTTP 500          v
+                     HTTP 400 No reply          v
                                              stdout
 ```
 For oversized requests, the stored `input` is the bounded placeholder `[request body omitted: exceeds maximum size]`, rather than the full request body. If recording the oversized request fails, the server returns HTTP `500` instead of `413`.
 
-Malformed JSON returns HTTP `400` if its rejection record is saved successfully, or HTTP `500` if that write fails.
+Malformed JSON returns HTTP `400` after its rejection record is saved. If that write fails, the exception is not caught, so the server closes the connection without sending a response.
 
 Valid events are stored in `events.jsonl` and also produce a structured stdout log. Invalid or malformed submissions are recorded separately in `rejected-events.jsonl`.
-
-Invalid or malformed submissions are recorded separately in `rejected-events.jsonl`.
 
 ---
 
