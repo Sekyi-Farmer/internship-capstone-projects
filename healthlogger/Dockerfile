@@ -21,7 +21,7 @@ COPY --from=build /build/target/healthlogger-0.1.0.jar /app/app.jar
 COPY --from=build /build/target/dependency/ /app/dependency/
 COPY --from=build /build/config/ /app/config/
 
-RUN mkdir -p /app/data
+RUN mkdir -p /app/data \
     && chown -R 10001:10001 /app
 
 USER 10001:10001

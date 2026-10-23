@@ -26,6 +26,31 @@ Use `exec.arguments` (comma-separated) so Maven does not steal flags such as `--
 
 `serve` listens on `127.0.0.1` and the port in the client spec (default 8088).
 
+## Run with Docker
+
+Requires Docker with Compose.
+
+```bash
+cd healthlogger
+docker compose up --build
+```
+
+In another terminal:
+
+```bash
+curl http://127.0.0.1:8088/health
+curl -X POST http://127.0.0.1:8088/events \
+  -H "Content-Type: application/json" \
+  -d '{"service":"payments-api","status":"ok","timestamp":"2026-09-29T10:00:00Z"}'
+```
+
+Notes:
+
+- The container runs as a non-root user (UID 10001) and listens on `0.0.0.0` inside the container. Compose publishes the port on `127.0.0.1` only, so it is not reachable from other machines.
+- Events and rejected submissions are stored in the `healthlogger-data` Docker volume (mounted at `/app/data`), so they survive restarts.
+- Stop with `docker compose down`. Add `-v` to also delete the stored data.
+- CI builds the image and scans it with Trivy (HIGH and CRITICAL findings fail the build).
+
 ## Git / PR workflow
 
 | Work | PR target |
