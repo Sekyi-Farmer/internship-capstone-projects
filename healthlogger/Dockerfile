@@ -6,9 +6,8 @@ WORKDIR /build
 COPY pom.xml .
 COPY src ./src
 COPY config ./config
-
-RUN mvn -B package dependency:copy-dependencies -DincludeScope=runtime
-
+RUN mvn -B -ntp package dependency:copy-dependencies -DincludeScope=runtime \
+    && ls -l target/healthlogger-0.1.0.jar target/dependency
 # Stage 2: Run the application using a smaller Java 21 runtime
 FROM eclipse-temurin:21-jre
 
