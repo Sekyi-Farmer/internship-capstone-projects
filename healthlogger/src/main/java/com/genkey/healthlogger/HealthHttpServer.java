@@ -54,7 +54,7 @@ public final class HealthHttpServer {
         server.start();
 
         System.err.println(
-                "listening on http://127.0.0.1:" + spec.port()
+                "listening on http://127.0.0.1:" + server.getAddress().getPort()
         );
     }
 
@@ -63,6 +63,13 @@ public final class HealthHttpServer {
             server.stop(0);
         }
     }
+    public int port() {
+    if (server == null) {
+        throw new IllegalStateException("Server has not started");
+    }
+
+    return server.getAddress().getPort();
+}
 
     private void health(HttpExchange ex) throws IOException {
         if (!"GET".equals(ex.getRequestMethod())) {
@@ -98,7 +105,26 @@ public final class HealthHttpServer {
                     ex.getRequestBody(),
                     MAX_REQUEST_BODY_BYTES
             );
+
         } catch (RequestTooLargeException e) {
+            try {
+                rejectedStore.append(
+                        "[request body omitted: exceeds maximum size]",
+                        "request body exceeds maximum size"
+                );
+            } catch (IOException loggingError) {
+                System.err.println(
+                        "Failed to record oversized request: "
+                                + loggingError.getMessage()
+                 );
+                send(
+                        ex,
+                        500,
+                        "{\"error\":\"failed to record rejected request\"}"
+                );
+                return;
+            }
+
             send(
                     ex,
                     413,
@@ -107,12 +133,14 @@ public final class HealthHttpServer {
             return;
         }
 
+
         String body = new String(
                 bodyBytes,
                 StandardCharsets.UTF_8
         );
 
         HealthEvent event;
+
 
         try {
             event = Json.parseEvent(body);
@@ -125,15 +153,13 @@ public final class HealthHttpServer {
             send(
                     ex,
                     400,
-                    Json.toJson(
-                            Map.of(
-                                    "error",
-                                    "malformed JSON"
-                            )
-                    )
+                    "{\"error\":\"malformed JSON\"}"
             );
             return;
         }
+
+
+
 
         List<String> issues = Json.validate(event, spec);
 
