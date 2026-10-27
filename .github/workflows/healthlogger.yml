@@ -1,13 +1,14 @@
+
 name: HealthLogger
 
 on:
   push:
-    branches: [main, "intern/**"]
+    branches: [main, "intern/**", "interns/**"]
     paths:
       - "healthlogger/**"
       - ".github/workflows/healthlogger.yml"
   pull_request:
-    branches: [main, "intern/**"]
+    branches: [main, "intern/**", "interns/**"]
     paths:
       - "healthlogger/**"
       - ".github/workflows/healthlogger.yml"
