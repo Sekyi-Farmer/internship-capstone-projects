@@ -58,9 +58,7 @@ public final class HealthHttpServer {
         );
     }
 
-    public int port() {
-        return server.getAddress().getPort();
-    }
+   
 
     public void stop() {
         if (server != null) {
