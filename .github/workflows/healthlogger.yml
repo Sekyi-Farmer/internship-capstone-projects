@@ -53,7 +53,7 @@ jobs:
 
       - name: Scan HealthLogger image
         if: hashFiles('healthlogger/Dockerfile') != ''
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: "healthlogger:ci"
           severity: "CRITICAL,HIGH"
