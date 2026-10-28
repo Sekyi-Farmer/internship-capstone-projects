@@ -69,9 +69,19 @@ public final class HealthHttpServer {
 
         server.start();
 
-        System.err.println(
+            System.err.println(
                 "listening on http://" + bindHost + ":" + server.getAddress().getPort()
         );
+    }
+
+    /** Host or address this server binds to. */
+    public String bindHost() {
+        return bindHost;
+    }
+
+    /** True when the listening socket is bound to a loopback address. */
+    public boolean isBoundToLoopback() {
+        return server != null && server.getAddress().getAddress().isLoopbackAddress();
     }
 
    
